@@ -1,0 +1,32 @@
+common:
+  output_directory: "/home/alexey/kronosoft/dataset2"
+steps:
+  - type: train_ngram
+    parameters:
+      data: inputs/part_2.ru
+      parameters:
+        norder: 15
+        dscale: 0.1
+      model: ru.model
+      
+  - type: filter
+    parameters:
+      inputs:
+      - inputs/part_1.en
+      - inputs/part_2.ru
+      outputs:
+      - outputs/finish_filtered.part_1.en
+      - outputs/finish_filtered.part_2.ru
+      filters:
+        - LanguageIDFilter:
+            name: langid
+            id_method: langid
+            languages: [en, ru]
+        - RegExpFilter:
+            regexps: "(неопр.)|(англ.)|(нем.)|(яп.)|(фин.)|(нид.)|(рус.)"
+            accept_match: false
+        - CrossEntropyFilter:
+            lm_params:
+              - filename: /home/alexey/kronosoft/dataset2/ru.model.model
+            thresholds: [25.0,25.0]
+              
